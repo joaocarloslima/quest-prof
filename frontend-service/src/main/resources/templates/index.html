@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chronos Quest</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css" />
+</head>
+<body class="bg-gray-950 text-gray-200" >
+
+<nav class="flex items-center justify-between flex-wrap bg-gray-900 p-4">
+    <h1 class="text-4xl font-bold">Chronos Quest</h1>
+    <div class="flex items-center gap-2">
+        <span th:text="${user}"></span>
+        <i class="icon-log-out"></i>
+    </div>
+</nav>
+
+<main class="p-10">
+<span class="text-gray-400" th:text="#{player.form.description}"></span>
+
+<div class="grid grid-cols-4 gap-4 mt-4">
+    <div class="text-center text-4xl p-4 border-gray-300 border-1 rounded-lg">
+        <i id="card-class" class="icon-sword"></i>
+    </div>
+    <div class="text-center text-4xl p-4 border-gray-300 border-1 rounded-lg">
+        <i class="icon-brain"></i>
+        <span id="card-intelligence">45</span>
+    </div>
+    <div class="text-center text-4xl p-4 border-gray-300 border-1 rounded-lg">
+        <i class="icon-biceps-flexed"></i>
+        <span id="card-strength">45</span>
+    </div>
+    <div class="text-center text-4xl p-4 border-gray-300 border-1 rounded-lg">
+        <i class="icon-bow-arrow"></i>
+        <span id="card-dexterity">45</span>
+    </div>
+</div>
+
+<form th:action="@{/player}" method="post" class="w-full max-w-lg mx-auto mt-10">
+    <div>
+        <label for="name" class="block text-sm font-medium text-gray-300"><i class="icon-user"></i> Nome do Personagem</label>
+        <input type="text" id="name" name="name" class="mt-1 block w-full p-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-pink-500 focus:border-pink-500 outline-none" placeholder="Digite o nome do personagem" required>
+    </div>
+    <div>
+        <label for="class" class="block text-sm font-medium text-gray-300 mt-4"><i class="icon-sword"></i> Classe do Personagem</label>
+        <select id="class" name="playerClass" class="mt-1 block w-full p-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-pink-500 focus:border-pink-500 outline-none">
+            <option value="WARRIOR">
+                Guerreiro
+            </option>
+            <option value="MAGE">Mago</option>
+            <option value="ROGUE">Ladino</option>
+
+        </select>
+    </div>
+    <div>
+        <label for="intelligence" class="block text-sm font-medium text-gray-300 mt-4"><i class="icon-brain"></i> Inteligência</label>
+        <input type="range" id="intelligence" name="intelligence" min="0" max="100" value="50" class="mt-1 w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label for="strength" class="block text-sm font-medium text-gray-300 mt-4"><i class="icon-biceps-flexed"></i> Força</label>
+        <input type="range" id="strength" name="strength" min="0" max="100" value="50" class="mt-1 w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label for="dexterity" class="block text-sm font-medium text-gray-300 mt-4"><i class="icon-bow-arrow"></i> Destreza</label>
+        <input type="range" id="dexterity" name="dexterity" min="0" max="100" value="50" class="mt-1 w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+
+    <div class="mt-6">
+        <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-pink-500">Iniciar Aventura</button>
+    </div>
+</form>
+</main>
+
+<script>
+    const maxPoints = 150;
+
+    const attributes = ['intelligence', 'strength', 'dexterity'];
+
+    attributes.forEach(attr => {
+        const input = document.getElementById(attr);
+        input.addEventListener('input', (e) => {
+            // Soma todos os valores
+            const total = attributes.reduce((sum, attr) => {
+                return sum + parseInt(document.getElementById(attr).value);
+            }, 0);
+
+            // Se passar de 150, ajusta o valor do atributo atual
+            if (total > maxPoints) {
+                const current = e.target;
+                const overflow = total - maxPoints;
+                current.value = parseInt(current.value) - overflow;
+
+                // Garante que não fique abaixo de zero
+                if (current.value < 0) current.value = 0;
+            }
+
+            // Atualiza o card
+            attributes.forEach(attr => {
+                document.getElementById(`card-${attr}`).innerText = document.getElementById(attr).value;
+            });
+        });
+    });
+
+    // Trocar ícone do card principal com base na classe
+    const classSelect = document.getElementById('class');
+    const classIcon = document.querySelector('#card-class');
+
+    const classIcons = {
+        WARRIOR: 'icon-axe',
+        MAGE: 'icon-wand',
+        ROGUE: 'icon-sword'
+    };
+
+    classSelect.addEventListener('change', (e) => {
+        const selectedClass = e.target.value;
+
+        // Remove todas as classes de ícone antigas
+        classIcon.classList.remove('icon-axe', 'icon-wand', 'icon-sword');
+
+        // Adiciona a nova classe
+        classIcon.classList.add(classIcons[selectedClass]);
+    });
+
+</script>
+</body>
+</html>
